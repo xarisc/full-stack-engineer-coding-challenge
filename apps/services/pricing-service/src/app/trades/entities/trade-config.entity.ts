@@ -1,3 +1,4 @@
+import { PricingSchema } from '@sandbox/types';
 import {
   Column,
   CreateDateColumn,
@@ -33,6 +34,9 @@ export class TradeConfig {
    */
   @Column({ type: 'jsonb', default: {} })
   metadata: Record<string, unknown>;
+
+  @Column({ name: 'pricing_schema', type: 'jsonb', nullable: true })
+  pricingSchema: PricingSchema | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

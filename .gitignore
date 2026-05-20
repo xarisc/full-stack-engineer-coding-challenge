@@ -32,3 +32,6 @@ yarn-error.log*
 
 # database volumes
 postgres-data/
+
+# .md files
+ROADMAP.md

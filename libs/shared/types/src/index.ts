@@ -28,3 +28,22 @@ export interface PaginatedResponse<T> {
  */
 export const TRADE_CODES = ['HVAC', 'SOLAR', 'WINDOWS', 'INSULATION', 'ROOFING'] as const;
 export type TradeCode = (typeof TRADE_CODES)[number];
+
+export type PricingSchemaFieldType = 'string' | 'number' | 'boolean' | 'enum';
+
+export interface PricingSchemaField {
+  name: string;
+  type: PricingSchemaFieldType;
+  required: boolean;
+  min?: number; // for number type
+  max?: number; // for number type
+  allowedValues?: string[]; // for enum type
+  dependsOn?: {
+    field: string;
+    equals: string | number | boolean;
+  };
+}
+
+export interface PricingSchema {
+  fields: PricingSchemaField[];
+}
