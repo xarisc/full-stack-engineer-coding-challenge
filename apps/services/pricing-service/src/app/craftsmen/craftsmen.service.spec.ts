@@ -1,14 +1,14 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, ObjectLiteral, Repository } from 'typeorm';
 import { JwtPayload, UserRole } from '@sandbox/types';
 
 import { Craftsman } from './entities/craftsman.entity';
 import { CraftsmanTradeAssignment } from './entities/craftsman-trade-assignment.entity';
 import { CraftsmenService } from './craftsmen.service';
 
-type Repo<T> = Partial<Record<keyof Repository<T>, jest.Mock>>;
+type Repo<T extends ObjectLiteral> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 const adminUser: JwtPayload = {
   sub: 'admin-id',
@@ -81,7 +81,9 @@ describe('CraftsmenService', () => {
       transaction: jest.fn(async (cb: (m: unknown) => Promise<unknown>) =>
         cb({
           getRepository: (entity: unknown) =>
-            entity === Craftsman ? (repo as unknown as Repository<Craftsman>) : (assignments as unknown as Repository<CraftsmanTradeAssignment>),
+            entity === Craftsman
+              ? (repo as unknown as Repository<Craftsman>)
+              : (assignments as unknown as Repository<CraftsmanTradeAssignment>),
         }),
       ),
     } as unknown as DataSource;
@@ -151,9 +153,9 @@ describe('CraftsmenService', () => {
 
   describe('create', () => {
     it('rejects create for CRAFTSMAN role', async () => {
-      await expect(
-        service.create({ companyName: 'New' }, craftsmanUser),
-      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(service.create({ companyName: 'New' }, craftsmanUser)).rejects.toBeInstanceOf(
+        ForbiddenException,
+      );
     });
 
     it('persists a craftsman and its trade assignments inside a transaction', async () => {
@@ -176,19 +178,16 @@ describe('CraftsmenService', () => {
     it('rejects duplicate trade codes in payload', async () => {
       repo.save!.mockImplementation((x: Craftsman) => Promise.resolve({ ...x, id: 'new-id' }));
       await expect(
-        service.create(
-          { companyName: 'New', trades: ['HVAC', 'HVAC'] },
-          adminUser,
-        ),
+        service.create({ companyName: 'New', trades: ['HVAC', 'HVAC'] }, adminUser),
       ).rejects.toThrow(/Duplicate trade codes/);
     });
   });
 
   describe('update', () => {
     it('updates a single field', async () => {
-      repo.findOne!.mockResolvedValueOnce(buildCraftsman()).mockResolvedValueOnce(
-        buildCraftsman({ companyName: 'Renamed' }),
-      );
+      repo
+        .findOne!.mockResolvedValueOnce(buildCraftsman())
+        .mockResolvedValueOnce(buildCraftsman({ companyName: 'Renamed' }));
       repo.save!.mockResolvedValue(undefined);
       const result = await service.update(
         'partner-craftsman-id',
@@ -207,16 +206,12 @@ describe('CraftsmenService', () => {
 
   describe('remove', () => {
     it('rejects delete for CRAFTSMAN role', async () => {
-      await expect(service.remove('any', craftsmanUser)).rejects.toBeInstanceOf(
-        ForbiddenException,
-      );
+      await expect(service.remove('any', craftsmanUser)).rejects.toBeInstanceOf(ForbiddenException);
     });
 
     it('throws NotFoundException when delete affects 0 rows', async () => {
       repo.delete!.mockResolvedValue({ affected: 0 });
-      await expect(service.remove('missing', adminUser)).rejects.toBeInstanceOf(
-        NotFoundException,
-      );
+      await expect(service.remove('missing', adminUser)).rejects.toBeInstanceOf(NotFoundException);
     });
   });
 });
