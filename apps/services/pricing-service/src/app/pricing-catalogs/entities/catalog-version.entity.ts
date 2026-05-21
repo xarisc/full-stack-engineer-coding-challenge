@@ -27,6 +27,9 @@ export class CatalogVersion {
   @Index()
   craftsmanId: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  trade: string;
+
   @Column({ type: 'varchar', length: 20, default: CatalogVersionStatus.DRAFT })
   status: CatalogVersionStatus;
 
