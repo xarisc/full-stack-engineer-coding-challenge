@@ -49,6 +49,58 @@
       "max": "Maximum",
       "values": "Erlaubte Werte",
       "dependsOn": "Abhängig von"
+    },
+    "schema": {
+      "heading": "Preis-Schema",
+      "noFields": "Noch keine Felder definiert.",
+      "addFirstField": "Erstes Feld hinzufügen",
+      "addField": "Feld hinzufügen",
+      "save": "Schema speichern",
+      "saving": "Wird gespeichert …",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "columns": {
+        "name": "Name",
+        "type": "Typ",
+        "required": "Pflichtfeld",
+        "conditions": "Bedingung",
+        "actions": "Aktionen"
+      },
+      "types": {
+        "string": "Text",
+        "number": "Zahl",
+        "boolean": "Ja/Nein",
+        "enum": "Auswahl"
+      },
+      "fieldDialog": {
+        "titleAdd": "Feld hinzufügen",
+        "titleEdit": "Feld bearbeiten",
+        "name": "Feldname",
+        "type": "Typ",
+        "required": "Pflichtfeld",
+        "min": "Minimum",
+        "max": "Maximum",
+        "allowedValues": "Erlaubte Werte (kommagetrennt)",
+        "dependsOnField": "Abhängig von Feld",
+        "dependsOnEquals": "Wenn Wert gleich",
+        "noDependency": "Keine Abhängigkeit",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "errors": {
+          "nameRequired": "Feldname ist erforderlich.",
+          "nameDuplicate": "Dieser Feldname ist bereits vergeben.",
+          "minMaxInvalid": "Minimum darf nicht größer als Maximum sein.",
+          "enumEmpty": "Bitte mindestens einen erlaubten Wert angeben.",
+          "dependsOnUnknown": "Das referenzierte Feld existiert nicht im Schema."
+        }
+      },
+      "messages": {
+        "saved": "Schema gespeichert.",
+        "saveFailed": "Schema konnte nicht gespeichert werden.",
+        "conflict": "Das Schema konnte nicht gespeichert werden, da bestehende Katalog-Positionen ungültig würden. Bitte überprüfe die Änderungen."
+      }
     }
   }
 }

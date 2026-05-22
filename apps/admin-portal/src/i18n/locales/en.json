@@ -49,6 +49,58 @@
       "max": "Maximum",
       "values": "Allowed values",
       "dependsOn": "Depends on"
+    },
+    "schema": {
+      "heading": "Pricing schema",
+      "noFields": "No fields defined yet.",
+      "addFirstField": "Add the first field",
+      "addField": "Add field",
+      "save": "Save schema",
+      "saving": "Saving…",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "edit": "Edit",
+      "delete": "Delete",
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "required": "Required",
+        "conditions": "Condition",
+        "actions": "Actions"
+      },
+      "types": {
+        "string": "Text",
+        "number": "Number",
+        "boolean": "Yes/No",
+        "enum": "Selection"
+      },
+      "fieldDialog": {
+        "titleAdd": "Add field",
+        "titleEdit": "Edit field",
+        "name": "Field name",
+        "type": "Type",
+        "required": "Required",
+        "min": "Minimum",
+        "max": "Maximum",
+        "allowedValues": "Allowed values (comma-separated)",
+        "dependsOnField": "Depends on field",
+        "dependsOnEquals": "When value equals",
+        "noDependency": "No dependency",
+        "save": "Save",
+        "cancel": "Cancel",
+        "errors": {
+          "nameRequired": "Field name is required.",
+          "nameDuplicate": "This field name is already in use.",
+          "minMaxInvalid": "Minimum must not be greater than maximum.",
+          "enumEmpty": "Please provide at least one allowed value.",
+          "dependsOnUnknown": "The referenced field does not exist in the schema."
+        }
+      },
+      "messages": {
+        "saved": "Schema saved.",
+        "saveFailed": "Could not save schema.",
+        "conflict": "The schema could not be saved because existing catalog positions would become invalid. Please review your changes."
+      }
     }
   }
 }

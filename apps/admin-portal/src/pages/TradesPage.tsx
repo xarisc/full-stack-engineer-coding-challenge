@@ -1,6 +1,5 @@
 import {
   Alert,
-  Box,
   Chip,
   Paper,
   Skeleton,
@@ -17,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '../services/api.service';
 import { listTrades, TradeConfigResponse } from '../services/trades.service';
+import { SchemaEditor } from './SchemaEditor';
 
 /**
  * Read-only trade list. Shows the *current* state of each trade's pricing
@@ -34,6 +34,7 @@ export function TradesPage(): JSX.Element {
   const { t } = useTranslation();
   const [trades, setTrades] = useState<TradeConfigResponse[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
 
   useEffect(() => {
     listTrades()
@@ -79,9 +80,7 @@ export function TradesPage(): JSX.Element {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600 }}>{t('trades.columns.code')}</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>
-                    {t('trades.columns.displayName')}
-                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>{t('trades.columns.displayName')}</TableCell>
                   <TableCell sx={{ fontWeight: 600 }} align="center">
                     {t('trades.columns.isActive')}
                   </TableCell>
@@ -92,7 +91,15 @@ export function TradesPage(): JSX.Element {
               </TableHead>
               <TableBody>
                 {trades.map((trade) => (
-                  <TableRow key={trade.id} hover>
+                  <TableRow
+                    key={trade.id}
+                    hover
+                    selected={trade.trade === selectedTrade}
+                    onClick={() =>
+                      setSelectedTrade((prev) => (prev === trade.trade ? null : trade.trade))
+                    }
+                    sx={{ cursor: 'pointer' }}
+                  >
                     <TableCell>
                       <Typography variant="body2" fontFamily="monospace">
                         {trade.trade}
@@ -109,7 +116,7 @@ export function TradesPage(): JSX.Element {
                     </TableCell>
                     <TableCell align="right">
                       <Typography variant="body2" color="text.secondary">
-                        {countSchemaFields(trade.metadata)}
+                        {(trade.pricingSchema?.fields ?? []).length}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -121,11 +128,24 @@ export function TradesPage(): JSX.Element {
       )}
 
       {/*
-        TODO (candidate): per-trade detail / edit view goes here. Suggested:
-        click a row → opens a side panel or child route at /trades/:code
-        with the structured schema editor.
+        Schema editor — shown when the user clicks a trade row.
+        onSaved syncs the local trades list so the field count updates.
       */}
-      <Box />
+      {selectedTrade &&
+        trades &&
+        (() => {
+          const trade = trades.find((tr) => tr.trade === selectedTrade);
+          return trade ? (
+            <SchemaEditor
+              trade={trade}
+              onSaved={(updated) =>
+                setTrades((prev) =>
+                  prev ? prev.map((tr) => (tr.trade === updated.trade ? updated : tr)) : prev,
+                )
+              }
+            />
+          ) : null;
+        })()}
     </Stack>
   );
 }
