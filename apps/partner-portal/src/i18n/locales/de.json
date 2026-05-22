@@ -74,6 +74,8 @@
     "addPosition": "Position hinzufügen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
+    "deleteConfirmTitle": "Position löschen?",
+    "deleteConfirmText": "Soll diese Position wirklich gelöscht werden? Diese Aktion kann nicht rückgängig gemacht werden.",
     "publish": "Veröffentlichen",
     "publishConfirmTitle": "Katalog veröffentlichen?",
     "publishConfirmText": "Nach dem Veröffentlichen kann dieser Entwurf nicht mehr bearbeitet werden. Fortfahren?",
@@ -85,6 +87,7 @@
       "unit": "Einheit",
       "price": "Preis (Netto)",
       "vat": "MwSt.",
+      "attributes": "Gewerk-Attribute",
       "actions": "Aktionen"
     },
     "messages": {

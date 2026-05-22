@@ -1,8 +1,22 @@
-import { describe, expect, it } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { describe, expect, it, vi } from 'vitest';
 import { positionToDto } from './PricingCatalogPage';
-import { schemaFieldsToFormConfig } from './PositionDialog';
+import { schemaFieldsToFormConfig, PositionDialog } from './PositionDialog';
 import { quoteLinesToRows } from './QuotePanel';
 import type { PositionResponse } from '../services/pricing-catalog.service';
+
+// ─── Module mocks ─────────────────────────────────────────────────────────────
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
+}));
+
+vi.mock('../services/trades.service', () => ({
+  fetchTradeConfig: vi.fn().mockResolvedValue({ trade: 'GAS', pricingSchema: null }),
+}));
 
 // positionToDto
 
@@ -245,5 +259,30 @@ describe('quoteLinesToRows', () => {
 
   it('returns empty array for empty lines', () => {
     expect(quoteLinesToRows([], positions)).toEqual([]);
+  });
+});
+
+// ─── PositionDialog — integration: validation error display ──────────────────
+
+describe('PositionDialog — validation error display', () => {
+  it('shows required validation errors for all mandatory fields when submitting empty form', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    const onClose = vi.fn();
+
+    render(<PositionDialog open={true} trade="GAS" onSave={onSave} onClose={onClose} />);
+
+    // Click Save without filling any field
+    await user.click(screen.getByText('pricing.positionDialog.save'));
+
+    // react-hook-form validation should fire; i18n mock returns key as-is
+    await waitFor(() => {
+      const errors = screen.getAllByText('validation.required');
+      // key, label, unit, netPriceEuros, vatPercent — at least 3 required errors visible
+      expect(errors.length).toBeGreaterThanOrEqual(3);
+    });
+
+    // onSave must NOT have been called
+    expect(onSave).not.toHaveBeenCalled();
   });
 });

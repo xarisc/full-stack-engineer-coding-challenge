@@ -74,6 +74,8 @@
     "addPosition": "Add position",
     "edit": "Edit",
     "delete": "Delete",
+    "deleteConfirmTitle": "Delete position?",
+    "deleteConfirmText": "Are you sure you want to delete this position? This action cannot be undone.",
     "publish": "Publish",
     "publishConfirmTitle": "Publish catalog?",
     "publishConfirmText": "Once published, this draft can no longer be edited. Continue?",
@@ -85,6 +87,7 @@
       "unit": "Unit",
       "price": "Price (net)",
       "vat": "VAT",
+      "attributes": "Trade attributes",
       "actions": "Actions"
     },
     "messages": {

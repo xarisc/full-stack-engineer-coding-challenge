@@ -88,6 +88,7 @@ export function PricingCatalogPage(): JSX.Element {
   }>({ open: false });
   const [publishDialog, setPublishDialog] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [deleteConfirmKey, setDeleteConfirmKey] = useState<string | null>(null);
   const [snack, setSnack] = useState<SnackState | null>(null);
 
   // load craftsman
@@ -299,6 +300,7 @@ export function PricingCatalogPage(): JSX.Element {
                     <TableCell>{t('pricing.columns.unit')}</TableCell>
                     <TableCell align="right">{t('pricing.columns.price')}</TableCell>
                     <TableCell>{t('pricing.columns.vat')}</TableCell>
+                    <TableCell>{t('pricing.columns.attributes')}</TableCell>
                     {isDraft && <TableCell>{t('pricing.columns.actions')}</TableCell>}
                   </TableRow>
                 </TableHead>
@@ -314,6 +316,15 @@ export function PricingCatalogPage(): JSX.Element {
                       <TableCell>{pos.unit}</TableCell>
                       <TableCell align="right">{pos.netPriceFormatted}</TableCell>
                       <TableCell>{(pos.vatRate * 100).toFixed(1)} %</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {Object.entries(pos.tradeAttributes ?? {}).length > 0
+                            ? Object.entries(pos.tradeAttributes)
+                                .map(([k, v]) => `${k}: ${v}`)
+                                .join(' · ')
+                            : '–'}
+                        </Typography>
+                      </TableCell>
                       {isDraft && (
                         <TableCell>
                           <Stack direction="row" spacing={1}>
@@ -326,7 +337,7 @@ export function PricingCatalogPage(): JSX.Element {
                             <Button
                               size="small"
                               color="error"
-                              onClick={() => handleDeletePosition(pos.key)}
+                              onClick={() => setDeleteConfirmKey(pos.key)}
                             >
                               {t('pricing.delete')}
                             </Button>
@@ -355,6 +366,27 @@ export function PricingCatalogPage(): JSX.Element {
         onSave={handleSavePosition}
         onClose={() => setPositionDialog({ open: false })}
       />
+
+      {/* Delete confirm Dialog */}
+      <Dialog open={!!deleteConfirmKey} onClose={() => setDeleteConfirmKey(null)}>
+        <DialogTitle>{t('pricing.deleteConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('pricing.deleteConfirmText')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmKey(null)}>{t('pricing.cancel')}</Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              if (deleteConfirmKey) handleDeletePosition(deleteConfirmKey);
+              setDeleteConfirmKey(null);
+            }}
+          >
+            {t('pricing.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Publish confirm Dialog */}
       <Dialog open={publishDialog} onClose={() => setPublishDialog(false)}>
