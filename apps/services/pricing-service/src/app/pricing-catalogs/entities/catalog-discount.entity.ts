@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
+  UpdateDateColumn,
 } from 'typeorm';
 import { CatalogVersion } from './catalog-version.entity';
 
@@ -52,6 +53,9 @@ export class CatalogDiscount {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
   @ManyToOne(() => CatalogVersion, (v) => v.discounts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'version_id' })

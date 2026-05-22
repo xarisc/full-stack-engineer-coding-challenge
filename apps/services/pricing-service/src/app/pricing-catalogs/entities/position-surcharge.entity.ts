@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
+  UpdateDateColumn,
 } from 'typeorm';
 import { PricingPosition } from './pricing-position.entity';
 
@@ -43,6 +44,9 @@ export class PositionSurcharge {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
   @ManyToOne(() => PricingPosition, (p) => p.surcharges, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'position_id' })

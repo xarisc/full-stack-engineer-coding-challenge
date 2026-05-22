@@ -6,8 +6,8 @@ import {
   IsIn,
   IsInt,
   IsNumber,
+  IsObject,
   IsOptional,
-  IsPositive,
   IsString,
   Length,
   Max,
@@ -34,7 +34,7 @@ export class UpsertSurchargeDto {
   @ApiProperty({ required: false, nullable: true })
   @ValidateIf((o) => o.type === 'flat')
   @IsInt()
-  @IsPositive()
+  @Min(0)
   valueCents: number | null;
 
   @ApiProperty({ required: false, nullable: true })
@@ -89,6 +89,7 @@ export class UpsertPositionDto {
 
   @ApiProperty({ required: false, description: 'Trade-specific attributes stored as object' })
   @IsOptional()
+  @IsObject()
   tradeAttributes?: Record<string, unknown>;
 
   @ApiProperty({ required: false, default: 0 })

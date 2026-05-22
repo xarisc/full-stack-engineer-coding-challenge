@@ -35,13 +35,13 @@ export class PricingPosition {
   @Column({ type: 'varchar', length: 255 })
   label: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 20 })
   unit: PositionUnit;
 
   @Column({ name: 'net_price_cents', type: 'integer' })
   netPriceCents: number;
 
-  @Column({ name: 'vat_rate', type: 'numeric', precision: 5, scale: 4 })
+  @Column({ name: 'vat_rate', type: 'numeric', precision: 10, scale: 4 })
   vatRate: number;
 
   @Column({ name: 'min_quantity', type: 'numeric', precision: 10, scale: 4, nullable: true })

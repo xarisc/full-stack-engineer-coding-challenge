@@ -120,6 +120,8 @@ export class PricingCatalogsController {
     status: 400,
     description: 'unknown position keys or quantities out of range, etc.',
   })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Catalog version not found' })
   quote(
     @Param('versionId', ParseUUIDPipe) versionId: string,
     @Body() dto: QuoteRequestDto,
@@ -147,6 +149,8 @@ export class CraftsmanQuoteController {
     summary: 'Quote against the currently active PUBLISHED version for a craftsman + trade',
   })
   @ApiResponse({ status: 200, type: QuoteResponseDto })
+  @ApiResponse({ status: 400, description: 'Craftsman is inactive or invalid line items' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({
     status: 404,
     description: 'No published version found for this craftsman and trade',

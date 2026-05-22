@@ -34,6 +34,7 @@ export class TradesController {
   @Roles(UserRole.ADMIN, UserRole.CRAFTSMAN)
   @ApiOperation({ summary: 'Get one trade configuration by trade code' })
   @ApiResponse({ status: 200, type: TradeConfigResponseDto })
+  @ApiResponse({ status: 404, description: 'Trade not found' })
   findOne(@Param('trade') trade: string): Promise<TradeConfigResponseDto> {
     return this.service.findByCode(trade);
   }
@@ -43,6 +44,7 @@ export class TradesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update displayName and/or pricingSchema for a trade (ADMIN only)' })
   @ApiResponse({ status: 200, type: TradeConfigResponseDto })
+  @ApiResponse({ status: 404, description: 'Trade not found' })
   @ApiResponse({ status: 409, description: 'New schema invalidates existing positions' })
   update(
     @Param('trade') trade: string,

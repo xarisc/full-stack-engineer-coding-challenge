@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, ObjectLiteral } from 'typeorm';
@@ -8,6 +8,15 @@ import { PricingPosition } from '../pricing-catalogs/entities/pricing-position.e
 import { CatalogVersion } from '../pricing-catalogs/entities/catalog-version.entity';
 
 type Repo<T extends ObjectLiteral> = Partial<Record<keyof Repository<T>, jest.Mock>>;
+
+const TRADE_CONFIG = {
+  id: 'uuid-1',
+  trade: 'HVAC',
+  displayName: 'Heating',
+  isActive: true,
+  metadata: {},
+  pricingSchema: null,
+};
 
 describe('TradesService', () => {
   let service: TradesService;
@@ -63,5 +72,72 @@ describe('TradesService', () => {
   it('findByCode() throws NotFoundException when trade is unknown', async () => {
     repo.findOne.mockResolvedValue(null);
     await expect(service.findByCode('UNKNOWN')).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  describe('update()', () => {
+    it('returns updated config on happy path (no schema change)', async () => {
+      repo.findOne.mockResolvedValue({ ...TRADE_CONFIG });
+      repo.save.mockImplementation((e) => Promise.resolve(e));
+      const result = await service.update('HVAC', { displayName: 'Heating & Cooling' });
+      expect(result.displayName).toBe('Heating & Cooling');
+      expect(repo.save).toHaveBeenCalled();
+    });
+
+    it('throws NotFoundException when trade does not exist', async () => {
+      repo.findOne.mockResolvedValue(null);
+      await expect(service.update('UNKNOWN', { displayName: 'X' })).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+    });
+
+    it('skips position validation and clears schema when pricingSchema is null', async () => {
+      repo.findOne.mockResolvedValue({ ...TRADE_CONFIG, pricingSchema: { fields: [] } });
+      repo.save.mockImplementation((e) => Promise.resolve(e));
+      const result = await service.update('HVAC', { pricingSchema: null });
+      expect(catalogVersionRepo.find).not.toHaveBeenCalled();
+      expect(result.pricingSchema).toBeNull();
+    });
+
+    it('skips validation when no catalog versions exist for the trade', async () => {
+      const schema = { fields: [{ name: 'color', type: 'string' as const, required: true }] };
+      repo.findOne.mockResolvedValue({ ...TRADE_CONFIG });
+      catalogVersionRepo.find.mockResolvedValue([]);
+      repo.save.mockImplementation((e) => Promise.resolve(e));
+      const result = await service.update('HVAC', { pricingSchema: schema });
+      expect(positionRepo.createQueryBuilder).not.toHaveBeenCalled();
+      expect(result.pricingSchema).toEqual(schema);
+    });
+
+    it('throws ConflictException when new schema invalidates existing positions', async () => {
+      const schema = { fields: [{ name: 'color', type: 'string' as const, required: true }] };
+      repo.findOne.mockResolvedValue({ ...TRADE_CONFIG });
+      catalogVersionRepo.find.mockResolvedValue([{ id: 'v1', trade: 'HVAC' }]);
+      const qb = {
+        where: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([
+          { id: 'p1', key: 'pos-001', tradeAttributes: {} }, // missing required 'color'
+        ]),
+      };
+      positionRepo.createQueryBuilder.mockReturnValue(qb);
+      await expect(service.update('HVAC', { pricingSchema: schema })).rejects.toBeInstanceOf(
+        ConflictException,
+      );
+    });
+
+    it('saves successfully when new schema is valid for all existing positions', async () => {
+      const schema = { fields: [{ name: 'color', type: 'string' as const, required: true }] };
+      repo.findOne.mockResolvedValue({ ...TRADE_CONFIG });
+      catalogVersionRepo.find.mockResolvedValue([{ id: 'v1', trade: 'HVAC' }]);
+      const qb = {
+        where: jest.fn().mockReturnThis(),
+        getMany: jest
+          .fn()
+          .mockResolvedValue([{ id: 'p1', key: 'pos-001', tradeAttributes: { color: 'red' } }]),
+      };
+      positionRepo.createQueryBuilder.mockReturnValue(qb);
+      repo.save.mockImplementation((e) => Promise.resolve(e));
+      const result = await service.update('HVAC', { pricingSchema: schema });
+      expect(result.pricingSchema).toEqual(schema);
+    });
   });
 });

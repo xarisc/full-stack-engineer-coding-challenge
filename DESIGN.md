@@ -1,4 +1,4 @@
-# Mondey-Repräsentation
+# Money-Repräsentation
 
 Preise und Geldbeträge werden intern als Integer-Cents gespeichert und verrechnet (z.B. 19900 = €199,00).
 Begründung: Keine Floating-Point-Rundungsfehler, Integer-Arithmetik in Javascript/PostgreSQL ist exakt. Formatierung für die API-Response ausschließlich am Response-Boundary via `Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' })`. VAT-Sätze und Prozentsätze werden als `numeric(8,4)` gespeichert (z.B. 0.1900 für 19%, 5.0000 für 5%-Zuschlag).
@@ -20,7 +20,7 @@ Kein kumulierter Rundungsfehler, weil jeder Schritt eigenständig gerundet wird.
 
 # Concurrency beim Publish
 
-Unique Partial Index: CREATE UNIQUE INDEX ON pricing_service.catalog_versions (craftsman_id, trage) WHERE status = 'PUBLISHED'. Der zweite gleichzeitige Publish-Call bekommt eine PostgreSQL-uniquie-violation, die als 409 Conflict weitergereicht wird.
+Unique Partial Index: CREATE UNIQUE INDEX ON pricing_service.catalog_versions (craftsman_id, trade) WHERE status = 'PUBLISHED'. Der zweite gleichzeitige Publish-Call bekommt eine PostgreSQL-unique-violation, die als 409 Conflict weitergereicht wird.
 
 Nicht gewählt weil:
 
