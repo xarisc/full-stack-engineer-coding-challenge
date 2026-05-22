@@ -209,7 +209,7 @@ export class PricingCatalogsService {
 
     version.status = CatalogVersionStatus.PUBLISHED;
     version.publishedAt = new Date();
-    version.publishedBy = user.email;
+    version.publishedBy = user.sub;
 
     try {
       await this.versions.save(version);
