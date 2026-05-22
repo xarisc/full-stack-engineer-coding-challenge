@@ -49,14 +49,17 @@ In four terminals:
 # Terminal 1
 yarn nx serve auth-service          # port 3001
 ```
+
 ```bash
 # Terminal 2
 yarn nx serve pricing-service       # port 3000
 ```
+
 ```bash
 # Terminal 3
 yarn nx serve partner-portal        # port 4200
 ```
+
 ```bash
 # Terminal 4
 yarn nx serve admin-portal          # port 4201
@@ -108,12 +111,16 @@ This mirrors the production pattern: each service owns its schema, JWTs are veri
 
 ## 4. Seeded credentials
 
-| Role | Email | Password | Notes |
-|---|---|---|---|
-| `ADMIN` | `admin@example.com` | `admin123` | Full access; no `craftsmanId` claim. Use this in the **admin-portal** (`:4201`). |
+| Role        | Email                 | Password     | Notes                                                                                                                                                   |
+| ----------- | --------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ADMIN`     | `admin@example.com`   | `admin123`   | Full access; no `craftsmanId` claim. Use this in the **admin-portal** (`:4201`).                                                                        |
 | `CRAFTSMAN` | `partner@example.com` | `partner123` | Bound to seeded craftsman (`11111111-1111-1111-1111-111111111111`) with `HVAC` and `WINDOWS` assignments. Use this in the **partner-portal** (`:4200`). |
 
-The admin-portal rejects login by non-admins; the partner-portal accepts both but its *My Profile* page is craftsman-scoped (empty state for admins).
+// changed seeded craftsman id to viable v4 UUID
+legacy_PARTNER_CRAFTSMAN_ID = '11111111-1111-1111-1111-111111111111';
+PARTNER_CRAFTSMAN_ID = '11111111-1111-4111-a111-111111111111';
+
+The admin-portal rejects login by non-admins; the partner-portal accepts both but its _My Profile_ page is craftsman-scoped (empty state for admins).
 
 The partner craftsman's id is deterministic (`11111111-…`) so that auth-service and pricing-service seeds align without needing to read each other's database.
 
@@ -148,20 +155,20 @@ trade-pricing-challenge/
 
 When you need to understand a convention, look at:
 
-| Convention | Reference |
-|---|---|
-| Entity shape | `apps/services/pricing-service/src/app/craftsmen/entities/craftsman.entity.ts` |
-| DTO patterns | `apps/services/pricing-service/src/app/craftsmen/dto/` |
-| Controller | `apps/services/pricing-service/src/app/craftsmen/craftsmen.controller.ts` |
-| Service + authz | `apps/services/pricing-service/src/app/craftsmen/craftsmen.service.ts` |
-| Backend tests | `apps/services/pricing-service/src/app/craftsmen/*.spec.ts` |
-| Migration | `apps/services/pricing-service/src/migrations/1704067200000-Init.ts` |
-| Local JWT validation | `apps/services/pricing-service/src/app/auth/` |
-| MUI page with form (craftsman) | `apps/partner-portal/src/pages/ProfilePage.tsx` |
-| MUI page with table (admin) | `apps/admin-portal/src/pages/TradesPage.tsx` |
-| Admin-only login flow | `apps/admin-portal/src/contexts/AuthContext.tsx` |
-| i18n usage | `apps/partner-portal/src/i18n/locales/de.json` |
-| API clients (auth + main) | `apps/admin-portal/src/services/api.service.ts` |
+| Convention                     | Reference                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------ |
+| Entity shape                   | `apps/services/pricing-service/src/app/craftsmen/entities/craftsman.entity.ts` |
+| DTO patterns                   | `apps/services/pricing-service/src/app/craftsmen/dto/`                         |
+| Controller                     | `apps/services/pricing-service/src/app/craftsmen/craftsmen.controller.ts`      |
+| Service + authz                | `apps/services/pricing-service/src/app/craftsmen/craftsmen.service.ts`         |
+| Backend tests                  | `apps/services/pricing-service/src/app/craftsmen/*.spec.ts`                    |
+| Migration                      | `apps/services/pricing-service/src/migrations/1704067200000-Init.ts`           |
+| Local JWT validation           | `apps/services/pricing-service/src/app/auth/`                                  |
+| MUI page with form (craftsman) | `apps/partner-portal/src/pages/ProfilePage.tsx`                                |
+| MUI page with table (admin)    | `apps/admin-portal/src/pages/TradesPage.tsx`                                   |
+| Admin-only login flow          | `apps/admin-portal/src/contexts/AuthContext.tsx`                               |
+| i18n usage                     | `apps/partner-portal/src/i18n/locales/de.json`                                 |
+| API clients (auth + main)      | `apps/admin-portal/src/services/api.service.ts`                                |
 
 > Your work goes into `pricing-service`. **Do not** add new endpoints to `auth-service`; user identity belongs there and the challenge does not extend it.
 
@@ -203,8 +210,9 @@ yarn nx run pricing-service:seed
 ## 7. Troubleshooting
 
 **"relation does not exist" errors** —
+
 - If `auth_service.users` or `pricing_service.craftsmen` does not exist on first boot, migrations did not run. Under Docker the entrypoint runs them automatically; if you skipped that (e.g. went straight to `docker compose up` against an older image), rebuild: `docker compose down && docker compose up --build`. Under Path B, run `yarn nx run auth-service:migration:run` and `yarn nx run pricing-service:migration:run` before starting the services.
-- If the error is for one of *your* tables, you likely forgot the schema prefix in a migration or raw query. Pricing-service tables live under `pricing_service.*`; auth-service tables live under `auth_service.*`. See `CONVENTIONS.md` §3.7.
+- If the error is for one of _your_ tables, you likely forgot the schema prefix in a migration or raw query. Pricing-service tables live under `pricing_service.*`; auth-service tables live under `auth_service.*`. See `CONVENTIONS.md` §3.7.
 
 **"jwt malformed" on every request** — the partner-portal stores the token in `localStorage`. Clear it via DevTools or run `localStorage.clear()` in the console.
 
@@ -231,5 +239,3 @@ Make sure that on a clean clone:
 - `node_modules/`, `dist/`, and editor / OS files are gitignored.
 
 Do not include any secrets, real customer data, or non-public code from previous employers.
- 
-

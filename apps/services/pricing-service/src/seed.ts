@@ -13,7 +13,10 @@ const log = new Logger('Seed');
  * auth-service so JWT `craftsmanId` claims resolve to a real craftsman.
  * Cross-service id alignment is by convention; there is no FK across schemas.
  */
-const PARTNER_CRAFTSMAN_ID = '11111111-1111-1111-1111-111111111111';
+
+// changed to viable v4 UUID
+const legacy_PARTNER_CRAFTSMAN_ID = '11111111-1111-1111-1111-111111111111';
+const PARTNER_CRAFTSMAN_ID = '11111111-1111-4111-a111-111111111111';
 
 const TRADE_NAMES: Record<string, string> = {
   HVAC: 'Heating, Ventilation & Air Conditioning',

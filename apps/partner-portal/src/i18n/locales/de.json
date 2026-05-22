@@ -58,5 +58,74 @@
     "required": "Pflichtfeld",
     "email": "Ungültige E-Mail",
     "maxLength": "Maximal {{n}} Zeichen"
+  },
+  "pricing": {
+    "heading": "Mein Preiskatalog",
+    "subheading": "Verwalte Deine Preiskataloge je Gewerk.",
+    "empty": "Kein Handwerker mit diesem Konto verknüpft.",
+    "noTrades": "Dir sind noch keine Gewerke zugewiesen.",
+    "noDraft": "Kein Entwurf vorhanden.",
+    "createDraft": "Entwurf erstellen",
+    "status": "Status",
+    "statusLabel": {
+      "DRAFT": "Entwurf",
+      "PUBLISHED": "Veröffentlicht"
+    },
+    "addPosition": "Position hinzufügen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "publish": "Veröffentlichen",
+    "publishConfirmTitle": "Katalog veröffentlichen?",
+    "publishConfirmText": "Nach dem Veröffentlichen kann dieser Entwurf nicht mehr bearbeitet werden. Fortfahren?",
+    "cancel": "Abbrechen",
+    "noPositions": "Noch keine Positionen vorhanden.",
+    "columns": {
+      "key": "Schlüssel",
+      "label": "Bezeichnung",
+      "unit": "Einheit",
+      "price": "Preis (Netto)",
+      "vat": "MwSt.",
+      "actions": "Aktionen"
+    },
+    "messages": {
+      "loadFailed": "Katalog konnte nicht geladen werden.",
+      "saved": "Position gespeichert.",
+      "saveFailed": "Speichern fehlgeschlagen.",
+      "published": "Katalog erfolgreich veröffentlicht.",
+      "publishFailed": "Veröffentlichen fehlgeschlagen.",
+      "created": "Entwurf erstellt.",
+      "createFailed": "Entwurf konnte nicht erstellt werden.",
+      "deleteFailed": "Löschen fehlgeschlagen."
+    },
+    "positionDialog": {
+      "titleAdd": "Position hinzufügen",
+      "titleEdit": "Position bearbeiten",
+      "key": "Schlüssel",
+      "label": "Bezeichnung",
+      "unit": "Einheit",
+      "netPrice": "Nettopreis (€)",
+      "netPriceHint": "Eingabe in Euro, z. B. 199.00",
+      "vatRate": "MwSt.-Satz (%)",
+      "vatRateHint": "Eingabe in Prozent, z. B. 19.00",
+      "minQuantity": "Mindestmenge",
+      "maxQuantity": "Maximalmenge",
+      "save": "Speichern"
+    },
+    "quote": {
+      "heading": "Angebot berechnen",
+      "loadFailed": "Berechnung fehlgeschlagen.",
+      "position": "Position",
+      "quantity": "Menge",
+      "removeItem": "Eintrag entfernen",
+      "addItem": "Eintrag hinzufügen",
+      "calculate": "Berechnen",
+      "colPosition": "Position",
+      "colQty": "Menge",
+      "colBase": "Basispreis",
+      "colNet": "Netto",
+      "netLabel": "Netto ({{vat}} %)",
+      "vatLabel": "MwSt. ({{vat}} %)",
+      "totalGross": "Gesamtbetrag (Brutto)"
+    }
   }
 }

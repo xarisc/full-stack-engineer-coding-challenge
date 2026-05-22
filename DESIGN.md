@@ -40,3 +40,8 @@ Grund: Explizites Feedback statt stilles Markieren und der Admin kann somit gezi
 - Conventions reviewed
 - gezielt Tests generieren lassen, im Anschluss reviewed
 - code analyse / Verbesserungsvorschläge eingeholt für refactoring z.B. component splitting
+- übersetzungen generieren lassen, im Anschluss reviewed
+
+# Anmerkung zu eigentlich Untersagten Änderungen an auth-service
+
+ich habe die seed uuid '11111111-1111-1111-1111-111111111111' des PARTNER_CRAFTSMAN geändert zu '11111111-1111-4111-a111-111111111111' um RFC 4122 konform zu bleiben und isUUID() verwenden zu können.

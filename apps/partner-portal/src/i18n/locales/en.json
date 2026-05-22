@@ -58,5 +58,74 @@
     "required": "Required",
     "email": "Invalid email",
     "maxLength": "Maximum {{n}} characters"
+  },
+  "pricing": {
+    "heading": "My Pricing Catalog",
+    "subheading": "Manage your pricing catalogs per trade.",
+    "empty": "No craftsman is linked to this account.",
+    "noTrades": "No trades have been assigned to you yet.",
+    "noDraft": "No draft catalog found.",
+    "createDraft": "Create Draft",
+    "status": "Status",
+    "statusLabel": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published"
+    },
+    "addPosition": "Add position",
+    "edit": "Edit",
+    "delete": "Delete",
+    "publish": "Publish",
+    "publishConfirmTitle": "Publish catalog?",
+    "publishConfirmText": "Once published, this draft can no longer be edited. Continue?",
+    "cancel": "Cancel",
+    "noPositions": "No positions yet.",
+    "columns": {
+      "key": "Key",
+      "label": "Label",
+      "unit": "Unit",
+      "price": "Price (net)",
+      "vat": "VAT",
+      "actions": "Actions"
+    },
+    "messages": {
+      "loadFailed": "Could not load catalog.",
+      "saved": "Position saved.",
+      "saveFailed": "Could not save position.",
+      "published": "Catalog published successfully.",
+      "publishFailed": "Could not publish catalog.",
+      "created": "Draft created.",
+      "createFailed": "Could not create draft.",
+      "deleteFailed": "Could not delete position."
+    },
+    "positionDialog": {
+      "titleAdd": "Add position",
+      "titleEdit": "Edit position",
+      "key": "Key",
+      "label": "Label",
+      "unit": "Unit",
+      "netPrice": "Net price (€)",
+      "netPriceHint": "Enter in euros, e.g. 199.00",
+      "vatRate": "VAT rate (%)",
+      "vatRateHint": "Enter as percentage, e.g. 19.00",
+      "minQuantity": "Min. quantity",
+      "maxQuantity": "Max. quantity",
+      "save": "Save"
+    },
+    "quote": {
+      "heading": "Calculate quote",
+      "loadFailed": "Calculation failed.",
+      "position": "Position",
+      "quantity": "Quantity",
+      "removeItem": "Remove item",
+      "addItem": "Add item",
+      "calculate": "Calculate",
+      "colPosition": "Position",
+      "colQty": "Qty",
+      "colBase": "Base price",
+      "colNet": "Net",
+      "netLabel": "Net ({{vat}} %)",
+      "vatLabel": "VAT ({{vat}} %)",
+      "totalGross": "Total (gross)"
+    }
   }
 }

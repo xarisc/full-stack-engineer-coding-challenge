@@ -4,17 +4,14 @@ import { AppLayout } from './components/AppLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { PricingCatalogPage } from './pages/PricingCatalogPage';
 import { theme } from './theme/theme';
 
 function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {
   const { user, isLoading } = useAuth();
   if (isLoading) {
     return (
-      <Stack
-        sx={{ minHeight: '100vh' }}
-        alignItems="center"
-        justifyContent="center"
-      >
+      <Stack sx={{ minHeight: '100vh' }} alignItems="center" justifyContent="center">
         <CircularProgress />
       </Stack>
     );
@@ -39,6 +36,16 @@ export function App(): JSX.Element {
                 <RequireAuth>
                   <AppLayout>
                     <ProfilePage />
+                  </AppLayout>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/pricing-catalog"
+              element={
+                <RequireAuth>
+                  <AppLayout>
+                    <PricingCatalogPage />
                   </AppLayout>
                 </RequireAuth>
               }
