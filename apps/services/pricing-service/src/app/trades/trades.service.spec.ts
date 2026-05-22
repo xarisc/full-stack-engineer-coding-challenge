@@ -1,20 +1,39 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ObjectLiteral } from 'typeorm';
 import { TradeConfig } from './entities/trade-config.entity';
 import { TradesService } from './trades.service';
+import { PricingPosition } from '../pricing-catalogs/entities/pricing-position.entity';
+import { CatalogVersion } from '../pricing-catalogs/entities/catalog-version.entity';
+
+type Repo<T extends ObjectLiteral> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 describe('TradesService', () => {
   let service: TradesService;
-  let repo: { find: jest.Mock; findOne: jest.Mock };
+  let repo: { find: jest.Mock; findOne: jest.Mock; save: jest.Mock };
+  let positionRepo: { createQueryBuilder: jest.Mock };
+  let catalogVersionRepo: { find: jest.Mock };
 
   beforeEach(async () => {
-    repo = { find: jest.fn(), findOne: jest.fn() };
+    repo = { find: jest.fn(), findOne: jest.fn(), save: jest.fn() };
+    positionRepo = { createQueryBuilder: jest.fn() };
+    catalogVersionRepo = { find: jest.fn() };
     const moduleRef = await Test.createTestingModule({
       providers: [
         TradesService,
-        { provide: getRepositoryToken(TradeConfig), useValue: repo as Partial<Repository<TradeConfig>> },
+        {
+          provide: getRepositoryToken(TradeConfig),
+          useValue: repo as Partial<Repository<TradeConfig>>,
+        },
+        {
+          provide: getRepositoryToken(PricingPosition),
+          useValue: positionRepo as Partial<Repository<PricingPosition>>,
+        },
+        {
+          provide: getRepositoryToken(CatalogVersion),
+          useValue: catalogVersionRepo as Partial<Repository<CatalogVersion>>,
+        },
       ],
     }).compile();
     service = moduleRef.get(TradesService);

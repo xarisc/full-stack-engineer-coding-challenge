@@ -7,6 +7,7 @@ import { CatalogDiscount } from './entities/catalog-discount.entity';
 import { TradeConfig } from '../trades/entities/trade-config.entity';
 import { Craftsman } from '../craftsmen/entities/craftsman.entity';
 import { PricingCatalogsService } from './pricing-catalogs.service';
+import { CraftsmanQuoteController, PricingCatalogsController } from './pricing-catalogs.controller';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PricingCatalogsService } from './pricing-catalogs.service';
       Craftsman,
     ]),
   ],
+  controllers: [PricingCatalogsController, CraftsmanQuoteController],
   providers: [PricingCatalogsService],
   exports: [PricingCatalogsService],
 })
