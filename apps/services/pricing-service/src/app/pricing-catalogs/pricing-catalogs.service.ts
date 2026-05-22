@@ -215,7 +215,10 @@ export class PricingCatalogsService {
       await this.versions.save(version);
     } catch (err) {
       // postgres unique constraint violation
-      if (err instanceof QueryFailedError && (err as any).code === '23505') {
+      if (
+        err instanceof QueryFailedError &&
+        (err as QueryFailedError & { code?: string }).code === '23505'
+      ) {
         throw new ConflictException(
           'Another published version for this craftsman and trade already exists',
         );
@@ -236,6 +239,12 @@ export class PricingCatalogsService {
   ): Promise<QuoteResponseDto> {
     const version = await this.loadVersionWithRelations(versionId);
     this.assertCanAccess(version.craftsmanId, user);
+
+    const craftsman = await this.craftsmen.findOne({ where: { id: version.craftsmanId } });
+    if (!craftsman || !craftsman.isActive) {
+      throw new BadRequestException(`Craftsman is not active`);
+    }
+
     return this.calculateQuoteForVersion(version, dto);
   }
 
@@ -248,12 +257,16 @@ export class PricingCatalogsService {
   ): Promise<QuoteResponseDto> {
     this.assertCanAccess(craftsmanId, user);
 
+    const craftsman = await this.craftsmen.findOne({ where: { id: craftsmanId } });
+    if (!craftsman) {
+      throw new NotFoundException(`Craftsman ${craftsmanId} not found`);
+    }
+    if (!craftsman.isActive) {
+      throw new BadRequestException(`Craftsman ${craftsmanId} is not active`);
+    }
+
     const version = await this.versions.findOne({
-      where: {
-        craftsmanId,
-        trade,
-        status: CatalogVersionStatus.PUBLISHED,
-      },
+      where: { craftsmanId, trade, status: CatalogVersionStatus.PUBLISHED },
       relations: ['positions', 'discounts', 'positions.surcharges'],
     });
 
