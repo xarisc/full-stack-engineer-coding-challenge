@@ -16,6 +16,7 @@ import { PricingPosition } from './pricing-position.entity';
 export enum CatalogVersionStatus {
   DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
 }
 
 @Entity({ schema: 'pricing_service', name: 'catalog_versions' })

@@ -201,18 +201,27 @@ export class PricingCatalogsService {
     return CatalogVersionResponseDto.from(await this.loadVersionWithRelations(version.id));
   }
 
-  // publish DRAFT VERSION. unique partial index on version to ensure only one published version per craftsman and trade. exception results in 409 Conflict. Only for own craftsman. sets publishedAt and publishedBy fields.
+  // publish DRAFT VERSION. Runs in a transaction: first archives any currently PUBLISHED version
+  // for the same (craftsman, trade) so it stays readable for audit, then sets this draft to PUBLISHED.
+  // The unique partial index WHERE status='PUBLISHED' serves as the concurrency guard —
+  // a concurrent publish that races past the archive step will still trigger a 409.
   async publish(versionId: string, user: JwtPayload): Promise<CatalogVersionResponseDto> {
     const version = await this.loadVersionOrFail(versionId);
     this.assertCanAccess(version.craftsmanId, user);
     this.assertIsDraft(version);
 
-    version.status = CatalogVersionStatus.PUBLISHED;
-    version.publishedAt = new Date();
-    version.publishedBy = user.sub;
-
     try {
-      await this.versions.save(version);
+      await this.dataSource.transaction(async (tx) => {
+        const vRepo = tx.getRepository(CatalogVersion);
+        await vRepo.update(
+          { craftsmanId: version.craftsmanId, trade: version.trade, status: CatalogVersionStatus.PUBLISHED },
+          { status: CatalogVersionStatus.ARCHIVED },
+        );
+        version.status = CatalogVersionStatus.PUBLISHED;
+        version.publishedAt = new Date();
+        version.publishedBy = user.sub;
+        await vRepo.save(version);
+      });
     } catch (err) {
       // postgres unique constraint violation
       if (

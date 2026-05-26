@@ -20,7 +20,9 @@ Kein kumulierter Rundungsfehler, weil jeder Schritt eigenständig gerundet wird.
 
 # Concurrency beim Publish
 
-Unique Partial Index: CREATE UNIQUE INDEX ON pricing_service.catalog_versions (craftsman_id, trade) WHERE status = 'PUBLISHED'. Der zweite gleichzeitige Publish-Call bekommt eine PostgreSQL-unique-violation, die als 409 Conflict weitergereicht wird.
+Publish läuft in einer Transaktion: erst wird die aktuell PUBLISHED-Version desselben (craftsman, trade)-Paares auf ARCHIVED gesetzt (soft-delete, bleibt für Audit lesbar), dann wird die neue Version als PUBLISHED gespeichert.
+
+Unique Partial Index: CREATE UNIQUE INDEX ON pricing_service.catalog_versions (craftsman_id, trade) WHERE status = 'PUBLISHED'. Ein gleichzeitiger zweiter Publish-Call, der den ARCHIVED-Schritt überholt, bekommt eine PostgreSQL-unique-violation, die als 409 Conflict weitergereicht wird.
 
 Nicht gewählt weil:
 
@@ -31,6 +33,12 @@ Nicht gewählt weil:
 
 PATCH /trades/:trade prüft alle DRAFT- und PUBLISHED-Positionen dieses Trades gegen das neue Schema: Bei Verletzung: 409 Conflict mit Liste { positionID, positionKey, errors [] }.
 Grund: Explizites Feedback statt stilles Markieren und der Admin kann somit gezielt handeln.
+
+# effectiveFrom — Speicherung für künftige Erweiterungen
+
+Das Feld `effectiveFrom` wird gespeichert und in der Response zurückgegeben, wird aber derzeit nicht für Query-Logik verwendet. `quoteActive` findet die aktive Version schlicht per `WHERE status = 'PUBLISHED'`.
+
+Das Feld ist als Vorbereitung für §3.4.3 (Time-Travel-Quote) angelegt: sobald dieses Feature implementiert wird, kann `effectiveFrom` genutzt werden um die zu einem gegebenen Zeitpunkt aktive Version aufzulösen. Für die aktuelle Implementierung gilt: eine veröffentlichte Version ist sofort aktiv.
 
 # AI-Nutzung
 

@@ -61,6 +61,7 @@ export interface QuoteLineResult {
   surchargeTotalCents: number;
   lineTotalCents: number;
   vatRate: number;
+  appliedDiscounts: AppliedDiscount[];
 }
 
 export interface VatGroup {
@@ -113,6 +114,7 @@ function buildLine(item: QuoteLineItem, pos: PositionData): QuoteLineResult {
     surchargeTotalCents,
     lineTotalCents: lineNetCents + surchargeTotalCents,
     vatRate: pos.vatRate,
+    appliedDiscounts: [],
   };
 }
 
@@ -213,13 +215,23 @@ export function calculateQuote(
   const { appliedDiscounts, totalDiscountCents } = applyDiscounts(discounts, lines, subtotalCents);
   const discountedNetCents = subtotalCents - totalDiscountCents;
 
+  // Enrich each line with the position-specific discounts that applied to it.
+  // Subtotal-level discounts stay at catalog level only (result.discounts).
+  const enrichedLines = lines.map((line) => ({
+    ...line,
+    appliedDiscounts: appliedDiscounts.filter((ad) => {
+      const d = discounts.find((dd) => dd.key === ad.key);
+      return d?.appliesToType === 'positions' && (d.positionKeys ?? []).includes(line.positionKey);
+    }),
+  }));
+
   const vatGroups = buildVatGroups(lines, subtotalCents, discountedNetCents);
   const totalNetCents = vatGroups.reduce((sum, g) => sum + g.netCents, 0);
   const totalVatCents = vatGroups.reduce((sum, g) => sum + g.vatCents, 0);
   const totalGrossCents = vatGroups.reduce((sum, g) => sum + g.grossCents, 0);
 
   return {
-    lines,
+    lines: enrichedLines,
     discounts: appliedDiscounts,
     subtotalCents,
     totalDiscountCents,

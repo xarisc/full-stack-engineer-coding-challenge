@@ -172,6 +172,52 @@ describe('calculateQuote', () => {
       expect(result.totalDiscountCents).toBe(500);
       expect(result.subtotalCents).toBe(15000);
     });
+
+    it('populates appliedDiscounts on lines that match a position-keyed discount', () => {
+      const pos2 = makePosition({ key: 'pos-2', netPriceCents: 5000 });
+      const result = calculateQuote(
+        [
+          { positionKey: 'pos-1', quantity: 1 },
+          { positionKey: 'pos-2', quantity: 1 },
+        ],
+        [makePosition(), pos2],
+        [
+          {
+            key: 'd1',
+            label: 'Positionsrabatt',
+            type: 'flat',
+            valueCents: 200,
+            percentage: null,
+            capCents: null,
+            appliesToType: 'positions',
+            positionKeys: ['pos-2'],
+          },
+        ],
+      );
+      expect(result.lines.find((l) => l.positionKey === 'pos-2')?.appliedDiscounts).toHaveLength(1);
+      expect(result.lines.find((l) => l.positionKey === 'pos-1')?.appliedDiscounts).toHaveLength(0);
+    });
+
+    it('does not put subtotal-level discounts on individual lines', () => {
+      const result = calculateQuote(
+        [{ positionKey: 'pos-1', quantity: 1 }],
+        [makePosition()],
+        [
+          {
+            key: 'd1',
+            label: 'Gesamtrabatt',
+            type: 'flat',
+            valueCents: 500,
+            percentage: null,
+            capCents: null,
+            appliesToType: 'subtotal',
+            positionKeys: null,
+          },
+        ],
+      );
+      expect(result.lines[0].appliedDiscounts).toHaveLength(0);
+      expect(result.discounts).toHaveLength(1);
+    });
   });
 
   describe('VAT grouping', () => {

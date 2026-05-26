@@ -114,6 +114,7 @@ describe('PricingCatalogsService', () => {
           ...x,
         }),
       ),
+      update: jest.fn().mockResolvedValue({ affected: 0 }),
     };
 
     positionsRepo = {
@@ -356,6 +357,20 @@ describe('PricingCatalogsService', () => {
       const unexpectedError = new Error('connection lost');
       versionsRepo.save!.mockRejectedValue(unexpectedError);
       await expect(service.publish('version-id', adminUser)).rejects.toBe(unexpectedError);
+    });
+
+    it('archives the previously published version when a new draft is published', async () => {
+      versionsRepo
+        .findOne!.mockResolvedValueOnce(buildVersion()) // loadVersionOrFail
+        .mockResolvedValueOnce(buildVersion({ status: CatalogVersionStatus.PUBLISHED })); // reload
+      await service.publish('version-id', adminUser);
+      expect(versionsRepo.update).toHaveBeenCalledWith(
+        { craftsmanId: 'craftsman-a-id', trade: 'HVAC', status: CatalogVersionStatus.PUBLISHED },
+        { status: CatalogVersionStatus.ARCHIVED },
+      );
+      expect(versionsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ status: CatalogVersionStatus.PUBLISHED, publishedBy: 'admin' }),
+      );
     });
   });
 
